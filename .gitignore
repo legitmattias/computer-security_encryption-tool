@@ -1,0 +1,69 @@
+# Generic Python .gitignore
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Testing
+.tox/
+.nox/
+.coverage
+*.cover
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+
+# Pylint
+.pylintrc
+
+# Pytest
+.pytest_cache/
+
+# TypeScript (if used in project)
+*.tsbuildinfo
+
+### Custom ###
+
+# Ouput files
+output/
+
+# Dev notes
+devnotes*
+
+# Aux dev files
+aux/
+
+# Manual test files
+manual-test.js
+
+# Run scripts with env variables
+start-dev.sh
+start.sh
