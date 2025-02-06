@@ -1,4 +1,5 @@
 import math
+import itertools
 
 def validate_numeric_key(key):
     """Ensures the key contains only digits and removes duplicates."""
@@ -66,3 +67,21 @@ def transposition_decrypt(text, key):
                 decrypted_text += grid[col][i]
 
     return decrypted_text
+
+def brute_force_transposition(ciphertext, known_word, max_key_length=6):
+    """Brute-force transposition decryption by trying all key permutations up to a specified length."""
+    for key_length in range(2, max_key_length + 1):
+        for perm in itertools.permutations(range(1, key_length + 1)):
+            key = ''.join(map(str, perm))
+            try:
+                decrypted_text = transposition_decrypt(ciphertext, key)
+                if known_word in decrypted_text:
+                    print(f"Key Found: {key}")
+                    print(f"Decrypted Text: {decrypted_text}")
+                    return decrypted_text
+            except Exception as e:
+              print(f"Skipping invalid key due to error: {e}")
+              continue
+
+    print("No key found that matches the known word.")
+    return None
