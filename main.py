@@ -1,6 +1,6 @@
 import os
 from encryption.substitution import substitution_encrypt, substitution_decrypt, validate_substitution_key_input
-from encryption.transposition import transposition_encrypt, transposition_decrypt, validate_numeric_key
+from encryption.transposition import transposition_encrypt, transposition_decrypt, validate_transposition_key
 
 def get_mode():
     """Get encryption/decryption mode from the user."""
@@ -30,7 +30,7 @@ def get_file_name():
         else:
             print("Error: File not found. Please enter a valid file name.")
 
-def get_key(method):
+def get_key(text, method):
     """Get and validate key based on method."""
     while True:
         key = input("Enter the secret key: ").strip()
@@ -38,7 +38,7 @@ def get_key(method):
             if method == "S":
                 validate_substitution_key_input(key)
             elif method == "T":
-                validate_numeric_key(key)
+                validate_transposition_key(text, key)
             return key
         except ValueError as e:
             print(e)
@@ -49,11 +49,13 @@ def main():
     mode = get_mode()
     method = get_method()
     file_name, input_path = get_file_name()
-    key = get_key(method)
-
+    
     # Read the content from the input file with latin1 encoding
     with open(input_path, "r", encoding='latin1') as file:
         text = file.read()
+    
+    key = get_key(text, method)
+
 
     # Perform encryption or decryption
     if method == "S":
