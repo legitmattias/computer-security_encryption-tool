@@ -15,8 +15,8 @@ def generate_priority_keys():
 
     # Generate years from 1900 to 1999, excluding any that contain '0'
     for year in range(1900, 2000):
-      if "0" not in str(year):
-        priority_keys.append(year)
+        if "0" not in str(year):
+            priority_keys.append(year)
     return priority_keys
 
 def process_file(filename, folder_path, known_word, max_key_length, log_filename):
@@ -36,7 +36,7 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
         if result:
             break
 
-    # If not found, proceed with full brute-force
+    # If not found, proceed with full brute-force (generate all valid keys)
     if not result:
         for key_length in range(2, max_key_length + 1):  # Generate keys of increasing length
             for perm in itertools.permutations(range(1, key_length + 1)):  # Unique digits 1-9
@@ -66,10 +66,33 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
     log_filename = os.path.join(log_dir, f"transposition_decryption_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
     files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
+    total_start_time = time.time()
+
+    print("=== Transposition Cipher Brute-Force ===\n")
+    print(f"Folder: {folder_path}\n")
+    print(f"Keyword: {known_word}\n")
+    print(f"Max Key Length: {max_key_length}\n")
+    print("=======================================\n\n")
+
+    # Write log title and summary
+    with open(log_filename, 'w') as log_file:
+        log_file.write("=== Transposition Cipher Brute-Force Log ===\n")
+        log_file.write(f"Folder: {folder_path}\n")
+        log_file.write(f"Keyword: {known_word}\n")
+        log_file.write(f"Max Key Length: {max_key_length}\n")
+        log_file.write("=======================================\n\n")
 
     # Run decryption in parallel using multiple threads
-    with ThreadPoolExecutor(max_workers=8) as executor:  # Adjust max_workers based on CPU capabilities
+    with ThreadPoolExecutor(max_workers=8) as executor:  # Adjust max_workers based on your CPU
         executor.map(lambda filename: process_file(filename, folder_path, known_word, max_key_length, log_filename), files)
+    
+    total_end_time = time.time()
+    total_elapsed_time = total_end_time - total_start_time
+
+    # Log total time
+    with open(log_filename, 'a') as log_file:
+        print(f"⏱️ Total brute-force time: {total_elapsed_time:.2f} seconds")
+        log_file.write(f"⏱️ Total brute-force time: {total_elapsed_time:.2f} seconds\n")
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
