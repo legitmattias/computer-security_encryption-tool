@@ -1,5 +1,5 @@
 from encryption.substitution import substitution_encrypt, substitution_decrypt, generate_substitution_key, validate_substitution_key_input
-from encryption.transposition import transposition_encrypt, transposition_decrypt, validate_numeric_key
+from encryption.transposition import transposition_encrypt, transposition_decrypt, validate_transposition_key
 
 # Test data
 text = "test message"
@@ -28,7 +28,7 @@ except ValueError as e:
 
 # Test 3: Valid Transposition Key Encryption/Decryption
 try:
-    validate_numeric_key(trans_key_valid)
+    validate_transposition_key(trans_key_valid)
     enc_trans = transposition_encrypt(text, trans_key_valid)
     dec_trans = transposition_decrypt(enc_trans, trans_key_valid)
     assert dec_trans == text, "Transposition decryption failed with valid key."
@@ -38,7 +38,7 @@ except Exception as e:
 
 # Test 4: Invalid Transposition Key
 try:
-    validate_numeric_key(trans_key_invalid)
+    validate_transposition_key(trans_key_invalid)
     print("Test 4 Failed: Invalid transposition key was not rejected.")
 except ValueError as e:
     print("Test 4 Passed: Invalid transposition key correctly rejected.")
