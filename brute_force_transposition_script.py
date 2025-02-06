@@ -69,7 +69,7 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
 
 
 def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
-    """Runs decryption in parallel using multiple CPU threads."""
+    """Runs decryption in parallel using multiple CPU threads with dynamic scheduling."""
     log_dir = "logs"
     os.makedirs(log_dir, exist_ok=True)
     log_filename = os.path.join(log_dir, f"transposition_decryption_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
@@ -92,10 +92,16 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
         log_file.write(f"Max Key Length: {max_key_length}\n")
         log_file.write("=======================================\n\n")
 
-    # Run decryption in parallel using multiple threads
-    with ThreadPoolExecutor(max_workers=8) as executor:  # Adjust max_workers based on CPU
-        executor.map(lambda filename: process_file(filename, folder_path, known_word, max_key_length, log_filename), files)
-    
+    # Dynamically assign work with 'submit()'
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = []
+        for filename in files:
+            futures.append(executor.submit(process_file, filename, folder_path, known_word, max_key_length, log_filename))
+
+        # Ensure all tasks complete before continuing
+        for future in futures:
+            future.result()
+
     total_end_time = time.time()
     total_elapsed_time = total_end_time - total_start_time
 
@@ -103,6 +109,7 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
     with open(log_filename, 'a') as log_file:
         print(f"⏱️ Total brute-force time: {total_elapsed_time:.2f} seconds")
         log_file.write(f"⏱️ Total brute-force time: {total_elapsed_time:.2f} seconds\n")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
