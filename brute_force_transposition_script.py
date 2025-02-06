@@ -4,7 +4,11 @@ import itertools
 import time
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+import threading
+
 from encryption.transposition import brute_force_transposition
+
+output_lock = threading.Lock()  # Global lock for synchronized logging & printing
 
 def generate_priority_keys():
     """Generate a list of key combinations to try first based on common patterns."""
@@ -25,7 +29,6 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
     with open(file_path, 'r', encoding='latin1') as file:
         ciphertext = file.read()
 
-    print(f"Attempting to decrypt: {filename}")
     start_time = time.time()
 
     result = None
@@ -51,13 +54,16 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
     elapsed_time = end_time - start_time
 
     # Log results
-    with open(log_filename, 'a') as log_file:
-        if result:
-            print(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)")
-            log_file.write(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
-        else:
-            print(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)")
-            log_file.write(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
+    with output_lock:
+      with open(log_filename, 'a') as log_file:
+          print(f"🔍 Attempting to decrypt: {filename}")  # Now included in the lock
+          if result:
+              print(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)")
+              log_file.write(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
+          else:
+              print(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)")
+              log_file.write(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
+
 
 def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
     """Runs decryption in parallel using multiple CPU threads."""
@@ -68,6 +74,7 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
     files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
     total_start_time = time.time()
 
+    # Write title and summary to terminal (stdout)
     print("=== Transposition Cipher Brute-Force ===\n")
     print(f"Folder: {folder_path}\n")
     print(f"Keyword: {known_word}\n")
@@ -83,7 +90,7 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
         log_file.write("=======================================\n\n")
 
     # Run decryption in parallel using multiple threads
-    with ThreadPoolExecutor(max_workers=8) as executor:  # Adjust max_workers based on your CPU
+    with ThreadPoolExecutor(max_workers=8) as executor:  # Adjust max_workers based on CPU
         executor.map(lambda filename: process_file(filename, folder_path, known_word, max_key_length, log_filename), files)
     
     total_end_time = time.time()
