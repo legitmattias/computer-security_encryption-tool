@@ -79,7 +79,7 @@ def brute_force_transposition(ciphertext, known_word, key):
         decrypted_text = transposition_decrypt(ciphertext, key)
         if known_word in decrypted_text:
             print(f"✅ Key Found: {key}")
-            print(f"🔓 Decrypted Text: {decrypted_text}")
+            print(f"🔓 Decrypted Text:\n {decrypted_text}")
             return decrypted_text
     except ValueError as e:
         print(f"Skipping key {key}: {e}")  # Log invalid keys
