@@ -1,4 +1,7 @@
 import math
+import threading
+
+output_lock = threading.Lock()  # Global lock for synchronized logging & printing
 
 def validate_transposition_key(ciphertext, key):
     """Ensures the key contains only digits, has no zeros, and does not exceed ciphertext length."""
@@ -78,11 +81,12 @@ def brute_force_transposition(ciphertext, known_word, key):
     try:
         decrypted_text = transposition_decrypt(ciphertext, key)
         if known_word in decrypted_text:
-            print(f"✅ Key Found: {key}")
-            print(f"🔓 Decrypted Text:\n {decrypted_text}")
+            with output_lock:  # 🔒 Lock output to prevent scrambling
+                print(f"✅ Key Found: {key}")
+                print(f"🔓 Decrypted Text:\n {decrypted_text}")
             return decrypted_text
     except ValueError as e:
-        print(f"Skipping key {key}: {e}")  # Log invalid keys
+        print(f"Skipping key {key}: {e}")  # Log invalid keys (not locked)
     except Exception:
         pass  # Ignore decryption errors
 

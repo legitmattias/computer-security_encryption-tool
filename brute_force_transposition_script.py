@@ -30,6 +30,10 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
         ciphertext = file.read()
 
     start_time = time.time()
+    
+    thread_name = threading.current_thread().name
+    with output_lock:
+      print(f"🔍 Attempting to decrypt: {filename}. Assigned to 🤖 {thread_name}.")
 
     result = None
 
@@ -39,7 +43,7 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
         if result:
             break
 
-    # If not found, proceed with full brute-force (generate all valid keys)
+    # If not found, proceed with full brute-force
     if not result:
         for key_length in range(2, max_key_length + 1):  # Generate keys of increasing length
             for perm in itertools.permutations(range(1, key_length + 1)):  # Unique digits 1-9
@@ -56,13 +60,12 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
     # Log results
     with output_lock:
       with open(log_filename, 'a') as log_file:
-          print(f"🔍 Attempting to decrypt: {filename}")  # Now included in the lock
-          if result:
-              print(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)")
-              log_file.write(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
-          else:
-              print(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)")
-              log_file.write(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
+        if result:
+            print(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)")
+            log_file.write(f"✅ Decryption successful for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
+        else:
+            print(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)")
+            log_file.write(f"❌ No key found for file: {filename} (Time: {elapsed_time:.2f} seconds)\n")
 
 
 def search_folder_for_ciphers(folder_path, known_word, max_key_length=6):
@@ -109,5 +112,10 @@ if __name__ == "__main__":
     folder_path = sys.argv[1]
     known_word = sys.argv[2]
     max_key_length = int(sys.argv[3]) if len(sys.argv) > 3 else 6
+
+    # Sanitize max_key_length (should be between 2 and 9)
+    if not (2 <= max_key_length <= 9):
+        print(f"Invalid max_key_length: {max_key_length}. It must be between 2 and 9 (since 0 is not allowed in transposition keys).")
+        sys.exit(1)
 
     search_folder_for_ciphers(folder_path, known_word, max_key_length)
