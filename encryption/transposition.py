@@ -76,14 +76,15 @@ def transposition_decrypt(ciphertext, key):
 
     return decrypted_text
 
-def brute_force_transposition(ciphertext, known_word, key):
+def brute_force_transposition(ciphertext, known_word, key, no_show):
     """Attempts transposition decryption with a given key."""
     try:
         decrypted_text = transposition_decrypt(ciphertext, key)
         if known_word in decrypted_text.lower():
-            with output_lock:  # 🔒 Lock output to prevent scrambling
-                print(f"✅ Key Found: {key}")
-                print(f"🔓 Decrypted Text:\n {decrypted_text}\n")
+            with output_lock:
+                # Only print decrypted text if --no-show is NOT set
+                if not no_show:
+                    print(f"🔓 Text decrypted with key {key}:\n{decrypted_text}\n")
             return decrypted_text
     except ValueError as e:
         print(f"Skipping key {key}: {e}")  # Log invalid keys (not locked)
