@@ -4,12 +4,12 @@ import argparse
 import itertools
 import time
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
-import threading
+from concurrent.futures import ProcessPoolExecutor
+from multiprocessing import Manager, current_process
 
-from encryption.transposition import brute_force_transposition
+from encryption.transposition_mp import brute_force_transposition
 
-output_lock = threading.Lock()  # Global lock for synchronized logging & printing
+output_lock = Manager().Lock()  # Global lock for synchronized logging & printing
 
 def generate_priority_keys():
     """Generate a list of key combinations to try first based on common patterns."""
@@ -30,8 +30,8 @@ def process_file(filename, folder_path, known_word, max_key_length, log_filename
     with open(file_path, 'r', encoding='latin1') as file:
         ciphertext = file.read()
     
-    thread_name = threading.current_thread().name
-    print(f"🔍 Attempting to decrypt: {filename}. Assigned to 🤖 {thread_name}.")
+    process_name = current_process().name
+    print(f"🔍 Attempting to decrypt: {filename}. Assigned to 🤖 {process_name}.")
 
     start_time = time.time()
     result = None
@@ -100,7 +100,7 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6, no_show
     log_file.write("=======================================\n\n")
 
   # Dynamically assign work with 'submit()'
-  with ThreadPoolExecutor(max_workers=8) as executor:
+  with ProcessPoolExecutor(max_workers=max(1, os.cpu_count() - 2)) as executor:
       futures = []
       for filename in files:
           futures.append(executor.submit(process_file, filename, folder_path, known_word, max_key_length, log_filename, log_folder, no_show))

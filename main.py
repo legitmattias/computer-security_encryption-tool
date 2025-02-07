@@ -1,6 +1,6 @@
 import os
 from encryption.substitution import substitution_encrypt, substitution_decrypt, validate_substitution_key_input
-from encryption.transposition import transposition_encrypt, transposition_decrypt, validate_transposition_key
+from encryption.transposition_mt import transposition_encrypt, transposition_decrypt, validate_transposition_key
 
 def get_mode():
     """Get encryption/decryption mode from the user."""
