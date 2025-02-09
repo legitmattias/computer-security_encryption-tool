@@ -9,21 +9,32 @@ def analyze_substitution_cipher(file_path, output_folder):
     with open(file_path, "r", encoding="latin1") as file:
         text = file.read()
 
-    # Count character frequency
+    # Count all characters equally
     char_counts = Counter(text)
     total_chars = sum(char_counts.values())
 
-    # Sort by frequency
+    # Sort characters by frequency (descending)
     sorted_chars = sorted(char_counts.items(), key=lambda x: x[1], reverse=True)
+
+    # Improve readability for special characters in the histogram
+    def format_char(c):
+        if c == " ":
+            return "Space"
+        elif c == "\n":
+            return "Newline"
+        elif c == "\t":
+            return "Tab"
+        else:
+            return repr(c)
 
     # Generate histogram
     plt.figure(figsize=(12, 6))
-    plt.bar([char for char, _ in sorted_chars], [count for _, count in sorted_chars])
+    plt.bar([format_char(char) for char, _ in sorted_chars], [count for _, count in sorted_chars])
     plt.xlabel("Character")
     plt.ylabel("Frequency")
     plt.title(f"Character Frequency in {os.path.basename(file_path)}")
     plt.xticks(rotation=90)
-    
+
     # Save histogram
     histogram_path = os.path.join(output_folder, f"{os.path.basename(file_path)}_histogram.png")
     plt.savefig(histogram_path)
@@ -37,9 +48,10 @@ def analyze_substitution_cipher(file_path, output_folder):
         report_file.write(f"Total Characters: {total_chars}\n\n")
         report_file.write("Character | Count | Percentage\n")
         report_file.write("-" * 30 + "\n")
+
         for char, count in sorted_chars:
             percentage = (count / total_chars) * 100
-            report_file.write(f"  {repr(char)}  |  {count}  |  {percentage:.2f}%\n")
+            report_file.write(f"  {format_char(char)}  |  {count}  |  {percentage:.2f}%\n")
 
     print(f"📊 Analysis completed for {file_path}. Histogram and report saved in {output_folder}.")
 
