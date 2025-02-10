@@ -74,7 +74,7 @@ def search_folder_for_ciphers(folder_path, known_word, max_key_length=6, no_show
   """Runs decryption in parallel using multiple CPU threads with dynamic scheduling."""
 
   timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-  log_folder = os.path.join("logs", timestamp)
+  log_folder = os.path.join("logs", "trans", timestamp)
   os.makedirs(log_folder, exist_ok=True)
 
   log_filename = os.path.join(log_folder, f"transposition_decryption_{timestamp}.log")
