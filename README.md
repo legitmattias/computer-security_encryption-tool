@@ -101,8 +101,8 @@ python3 analyze_substitution.py ./ciphers
 
 Since brute-forcing transposition ciphers is computationally expensive, **multi-threading** and **multi-processing** implementations were added to speed up execution.
 
-- **Multi-threading (`mt`)**: Best suited for I/O-bound operations (Default)
-- **Multi-processing (`mp`)**: Utilizes all CPU cores for faster brute-force attempts (Default: max cores -2)
+- **Multi-threading (`mt`)**: Best suited for I/O-bound operations (Default: max cores - 2)
+- **Multi-processing (`mp`)**: Utilizes all CPU cores for faster brute-force attempts (Default: max cores - 2)
 
 ## Disclaimer
 
