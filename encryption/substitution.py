@@ -5,10 +5,6 @@ PRINTABLE_CHARS = ''.join(chr(i) for i in range(32, 127))
 
 def generate_substitution_key(base_key):
     """Generate a substitution key for printable ASCII characters."""
-    base_key = clean_key(base_key)
-
-    if len(base_key) == 0:
-        raise ValueError("Invalid key: Must contain at least one printable ASCII character.")
 
     remaining_chars = ''.join(c for c in PRINTABLE_CHARS if c not in base_key)
 
